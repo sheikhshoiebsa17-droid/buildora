@@ -14,8 +14,13 @@ const start = async () => {
   if (config.isProd && !process.env.MONGODB_URI && !process.env.MONGO_URL) {
     try {
       logger.info('No external MONGODB_URI provided. Starting embedded in-memory MongoDB for demo...');
+      process.env.MONGOMS_VERSION = process.env.MONGOMS_VERSION || '7.0.14';
       const { MongoMemoryServer } = await import('mongodb-memory-server');
-      const mongod = await MongoMemoryServer.create();
+      const mongod = await MongoMemoryServer.create({
+        binary: {
+          version: process.env.MONGOMS_VERSION,
+        },
+      });
       mongoUri = mongod.getUri();
       logger.info(`Embedded MongoDB active → ${mongoUri}`);
     } catch (err) {
