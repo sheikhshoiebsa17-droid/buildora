@@ -1,0 +1,15 @@
+{
+  "name": "buildora",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "build": "npm run build -w client",
+    "seed": "npm run seed -w server",
+    "start": "npm start -w server"
+  }
+}
