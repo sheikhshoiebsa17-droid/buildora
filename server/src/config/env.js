@@ -33,8 +33,7 @@ if (config.env !== 'test') {
     process.exit(1);
   }
   if (config.isProd && !process.env.MONGODB_URI && !process.env.MONGO_URL && !config.mongoUri.startsWith('mongodb+srv')) {
-    console.error('[config] MONGODB_URI or MONGO_URL is required in production.');
-    process.exit(1);
+    console.warn('[config] No external MONGODB_URI or MONGO_URL configured. Embedded MongoDB will be used.');
   }
 }
 

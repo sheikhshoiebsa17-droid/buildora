@@ -17,8 +17,12 @@ import { config } from '../config/env.js';
 const DEMO_EMAIL = 'demo@buildora.dev';
 const DEMO_PASSWORD = 'BuildoraDemo2026';
 
-const seed = async () => {
-  await mongoose.connect(config.mongoUri);
+export const seed = async (targetUri) => {
+  if (targetUri && mongoose.connection.readyState !== 1) {
+    await mongoose.connect(targetUri);
+  } else if (mongoose.connection.readyState !== 1) {
+    await mongoose.connect(config.mongoUri);
+  }
   console.log(`Connected: ${mongoose.connection.name}`);
 
   // Only re-seed the demo org; other orgs are untouched.
@@ -30,7 +34,7 @@ const seed = async () => {
     if (existingData > 0) {
       console.log('Demo organization already seeded — nothing to do.');
       console.log(`Login → ${DEMO_EMAIL} / ${DEMO_PASSWORD}`);
-      process.exit(0);
+      return;
     }
   }
 
@@ -180,10 +184,14 @@ const seed = async () => {
   console.log(`  Admin login : ${DEMO_EMAIL} / ${DEMO_PASSWORD}`);
   console.log('  Other demo users follow the pattern password#X (sales/pm/designer/finance).');
   console.log('──────────────────────────────────────');
-  process.exit(0);
 };
 
-seed().catch((err) => {
-  console.error('Seed failed:', err);
-  process.exit(1);
-});
+const isDirectRun = process.argv[1] && process.argv[1].endsWith('seed.js');
+if (isDirectRun) {
+  seed()
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error('Seed failed:', err);
+      process.exit(1);
+    });
+}
